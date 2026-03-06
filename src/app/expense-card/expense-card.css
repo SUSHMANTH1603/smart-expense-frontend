@@ -1,0 +1,60 @@
+/* We move the specific CSS from dashboard.css over to this child component */
+.expense-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #ecf0f1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.expense-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.expense-details strong {
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.category-badge {
+    background: #e8f4f8;
+    color: #3498db;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    width: fit-content;
+    font-weight: bold;
+}
+
+.date {
+    color: #7f8c8d;
+}
+
+.expense-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.delete-btn {
+    background: #ff7675;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.delete-btn:hover {
+    background: #d63031;
+}

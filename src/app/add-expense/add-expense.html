@@ -1,0 +1,31 @@
+<div class="form-container">
+  <h2>Add New Expense</h2>
+
+  <form [formGroup]="expenseForm" (ngSubmit)="onSubmit()">
+    
+    <div class="form-group">
+      <label for="title">What did you buy?</label>
+      <input type="text" id="title" formControlName="title" placeholder="e.g., Movie Tickets">
+    </div>
+
+    <div class="form-group">
+      <label for="amount">Amount (₹)</label>
+      <input type="number" id="amount" formControlName="amount" placeholder="0.00">
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category</label>
+      <select id="category" formControlName="category">
+        <option value="Food">Food & Dining</option>
+        <option value="Transport">Transportation</option>
+        <option value="Entertainment">Entertainment</option>
+        <option value="Utilities">Utilities</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <button type="submit" class="submit-btn" [disabled]="expenseForm.invalid">
+      Save Expense
+    </button>
+  </form>
+</div>

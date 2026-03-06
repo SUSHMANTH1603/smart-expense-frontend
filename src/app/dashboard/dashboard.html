@@ -1,0 +1,35 @@
+<div class="dashboard-container">
+    <header class="summary-card">
+        <h2>Total Spent</h2>
+        <h1>{{ expenseService.totalSpent() | currency:'INR' }}</h1>
+    </header>
+
+    <section class="expense-list">
+        <h3>Recent Transactions</h3>
+
+@for (expense of expenseService.expenses(); track expense.id) {
+      
+      @defer (on viewport) {
+        <app-expense-card 
+          [expenseItem]="expense" 
+          (delete)="onExpenseDeleted($event)">
+        </app-expense-card>
+      } 
+      @placeholder {
+        <div class="expense-item" style="opacity: 0.5;">
+          Loading expense...
+        </div>
+      }
+      @loading (minimum 500ms) {
+        <div class="expense-item" style="color: #3498db;">
+          Fetching component...
+        </div>
+      }
+
+    } @empty {
+      <div class="empty-state">
+        <p>No expenses found. Time to add some!</p>
+      </div>
+    }
+    </section>
+</div>

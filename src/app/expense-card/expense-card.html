@@ -1,0 +1,11 @@
+<div class="expense-item">
+    <div class="expense-details">
+        <strong>{{ expenseItem().title }}</strong>
+        <span class="category-badge">{{ expenseItem().category }}</span>
+        <small class="date">{{ expenseItem().date | date:'mediumDate' }}</small>
+    </div>
+    <div class="expense-amount">
+        {{ expenseItem().amount | currency:'INR' }}
+        <button class="delete-btn" (click)="onDeleteClick()">Delete</button>
+    </div>
+</div>

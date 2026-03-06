@@ -1,0 +1,84 @@
+.dashboard-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.summary-card h1 {
+    margin: 0;
+    font-size: 3rem;
+}
+
+.expense-list h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 0.5rem;
+}
+
+.expense-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #ecf0f1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.expense-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.expense-details strong {
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.category-badge {
+    background: #e8f4f8;
+    color: #3498db;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    width: fit-content;
+    font-weight: bold;
+}
+
+.date {
+    color: #7f8c8d;
+}
+
+.expense-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #7f8c8d;
+    background: #f9f9f9;
+    border-radius: 8px;
+}

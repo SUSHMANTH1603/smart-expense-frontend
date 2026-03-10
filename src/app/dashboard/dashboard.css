@@ -1,84 +1,116 @@
-.dashboard-container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
+/* The Total Spent Header Card */
 .summary-card {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    padding: 2rem;
-    border-radius: 12px;
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     text-align: center;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    border-top: 5px solid #3b82f6;
+    transform: translateY(0);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.summary-card h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
-    font-weight: 500;
-    opacity: 0.9;
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
 }
 
-.summary-card h1 {
-    margin: 0;
+.total-amount {
     font-size: 3rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 10px 0;
+    background: linear-gradient(to right, #3b82f6, #10b981);
+    -webkit-background-clip: text;
+    /* For older Safari */
+    background-clip: text;
+    /* THE FIX: The standard modern property */
+    -webkit-text-fill-color: transparent;
 }
 
-.expense-list h3 {
-    color: #2c3e50;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid #ecf0f1;
-    padding-bottom: 0.5rem;
-}
-
+/* Individual Expense Cards */
 .expense-item {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease-in-out;
+    animation: slideIn 0.4s ease-out;
+}
+
+.expense-item:hover {
     background: white;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    border: 1px solid #ecf0f1;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transform: scale(1.02);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #3b82f6;
 }
 
-.expense-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+/* Cool entrance animation for the list */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
-.expense-details strong {
-    color: #2c3e50;
+/* Modern Delete Button */
+.delete-btn {
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.delete-btn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* Live Search Bar Styling */
+.search-container {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.glass-search {
+    width: 100%;
+    padding: 16px 20px;
     font-size: 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+    color: #334155;
+    box-sizing: border-box;
+    /* Ensures padding doesn't break the width */
 }
 
-.category-badge {
-    background: #e8f4f8;
-    color: #3498db;
-    padding: 0.2rem 0.6rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    width: fit-content;
-    font-weight: bold;
+.glass-search:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    transform: translateY(-2px);
 }
 
-.date {
-    color: #7f8c8d;
-}
-
-.expense-amount {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #e74c3c;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 3rem;
-    color: #7f8c8d;
-    background: #f9f9f9;
-    border-radius: 8px;
+.glass-search::placeholder {
+    color: #94a3b8;
 }

@@ -1,35 +1,70 @@
-<div class="dashboard-container">
-    <header class="summary-card">
-        <h2>Total Spent</h2>
-        <h1>{{ expenseService.totalSpent() | currency:'INR' }}</h1>
-    </header>
+<div class="search-container">
+    <input type="text" [formControl]="searchControl" placeholder="Search by title or category (e.g., Food, Netflix)..."
+        class="glass-search">
+</div>
 
-    <section class="expense-list">
-        <h3>Recent Transactions</h3>
+<div class="summary-card">
+    <h2>Total Spent</h2>
+    <h1 class="total-amount">{{ expenseService.totalSpent() | currency:'INR' }}</h1>
+</div>
 
-@for (expense of expenseService.expenses(); track expense.id) {
-      
-      @defer (on viewport) {
-        <app-expense-card 
-          [expenseItem]="expense" 
-          (delete)="onExpenseDeleted($event)">
-        </app-expense-card>
-      } 
-      @placeholder {
-        <div class="expense-item" style="opacity: 0.5;">
-          Loading expense...
+@if (expenseService.stats().length > 0) {
+<div class="summary-card" style="text-align: left; padding: 25px;">
+    <h3 style="margin-top: 0; color: #334155; font-size: 1.2rem;">Spending by Category</h3>
+
+    <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+        @for (stat of expenseService.stats(); track stat._id) {
+        <div>
+            <div
+                style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; color: #475569;">
+                <span style="text-transform: capitalize;">{{ stat._id }}</span>
+                <span>{{ stat.totalSpent | currency:'INR' }}</span>
+            </div>
+
+            <div style="width: 100%; background-color: #e2e8f0; border-radius: 999px; height: 10px; overflow: hidden;">
+                <div style="height: 100%; border-radius: 999px; background: linear-gradient(to right, #3b82f6, #8b5cf6); transition: width 1s ease-out;"
+                    [style.width.%]="(stat.totalSpent / expenseService.totalSpent()) * 100">
+                </div>
+            </div>
         </div>
-      }
-      @loading (minimum 500ms) {
-        <div class="expense-item" style="color: #3498db;">
-          Fetching component...
-        </div>
-      }
+        }
+    </div>
+</div>
+}
 
+<div class="expense-list">
+    @for (expense of filteredExpenses(); track expense.id) {
+    <div class="expense-item">
+
+        <div>
+            <h3 style="margin: 0;">{{ expense.title }}</h3>
+            <p
+                style="margin: 8px 0 0 0; color: #64748b; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;">
+                <span [appCategoryColor]="expense.category">{{ expense.category }}</span>
+                <span>•</span>
+                <span>{{ expense.date | date:'mediumDate' }}</span>
+            </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span style="font-size: 1.2rem; font-weight: bold; color: #0f172a;">
+                {{ expense.amount | currency:'INR' }}
+            </span>
+
+            <button [routerLink]="['/edit-expense', expense.id]"
+                style="background: #e2e8f0; color: #475569; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s ease;">
+                Edit
+            </button>
+
+            <button class="delete-btn" (click)="onExpenseDeleted(expense.id)">
+                Delete
+            </button>
+        </div>
+
+    </div>
     } @empty {
-      <div class="empty-state">
-        <p>No expenses found. Time to add some!</p>
-      </div>
+    <div style="text-align: center; padding: 40px; color: #94a3b8;">
+        <h3>No expenses found.</h3>
+    </div>
     }
-    </section>
 </div>

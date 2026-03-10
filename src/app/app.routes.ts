@@ -1,14 +1,32 @@
 import { Routes } from '@angular/router';
-import { Dashboard } from './dashboard/dashboard';
-import { AddExpense } from './add-expense/add-expense';
+import { AuthComponent } from './auth/auth';
+import { authGuard } from './auth-guard';
+
+// Notice we REMOVED the static imports for Dashboard and AddExpense at the top!
 
 export const routes: Routes = [
-  // When the URL is exactly empty (e.g., localhost:4200/), load Dashboard
-  { path: '', component: Dashboard, pathMatch: 'full' },
+  // The Login page is loaded immediately (eager loading) because it's the front door
+  { path: 'login', component: AuthComponent },
 
-  // When the URL is localhost:4200/add, load AddExpense
-  { path: 'add', component: AddExpense },
+  // The Dashboard is LAZY LOADED. It is only fetched from the server IF the user passes the guard.
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./dashboard/dashboard').then(m => m.Dashboard),
+    canActivate: [authGuard]
+  },
 
-  // Wildcard route: If the user types a random URL, send them back to Dashboard
-  { path: '**', redirectTo: '' }
+  // The Add/Edit pages are also LAZY LOADED.
+  {
+    path: 'add-expense',
+    loadComponent: () => import('./add-expense/add-expense').then(m => m.AddExpenseComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'edit-expense/:id',
+    loadComponent: () => import('./add-expense/add-expense').then(m => m.AddExpenseComponent),
+    canActivate: [authGuard]
+  },
+
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '**', redirectTo: 'login' }
 ];

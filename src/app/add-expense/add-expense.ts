@@ -1,55 +1,61 @@
-import { Component, inject } from '@angular/core';
-// 1. Import the tools needed for Reactive Forms
+import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { ExpenseService } from '../services/expense';
-// 2. Import the Router so we can navigate back to the dashboard after saving
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router'; // Add ActivatedRoute
+import { ExpenseService } from '../services/expense'; // or expense.service
 
 @Component({
   selector: 'app-add-expense',
   standalone: true,
-  // 3. Add ReactiveFormsModule to the imports array!
   imports: [ReactiveFormsModule],
   templateUrl: './add-expense.html',
   styleUrl: './add-expense.css'
 })
-export class AddExpense {
-  
+export class AddExpenseComponent implements OnInit {
+  private expenseService = inject(ExpenseService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute); // The tool to read the URL
 
-  // Injecting our dependencies
-  expenseService = inject(ExpenseService);
-  router = inject(Router);
+  editId: string | null = null; // Keeps track of whether we are editing or adding
 
-  // 4. Define the FormGroup and its FormControls
   expenseForm = new FormGroup({
-    // Initial value is '', and it is strictly required
     title: new FormControl('', Validators.required),
-
-    // Initial value is null, required, and must be at least 1
     amount: new FormControl<number | null>(null, [Validators.required, Validators.min(1)]),
-
-    // Defaulting the dropdown to 'Food'
-    category: new FormControl('Food', Validators.required)
+    category: new FormControl('', Validators.required)
   });
 
-  // 5. The Submit Action
-  onSubmit() {
-    // Double-check if the form is valid before processing
-    if (this.expenseForm.valid) {
+  ngOnInit() {
+    // When the page loads, check if there is an ':id' in the URL
+    this.editId = this.route.snapshot.paramMap.get('id');
 
-      // We know the form is valid, so we safely extract the values
-      const newExpenseData = {
-        title: this.expenseForm.value.title!,
-        amount: Number(this.expenseForm.value.amount),
-        category: this.expenseForm.value.category!
-      };
+    if (this.editId) {
+      // We are in Edit Mode! Let's find the existing expense in our Signal
+      const existingExpense = this.expenseService.expenses().find(e => e.id === this.editId);
 
-      // Send the data to our centralized vault
-      this.expenseService.addExpense(newExpenseData);
-
-      // Navigate the user back to the Dashboard
-      this.router.navigate(['/']);
+      if (existingExpense) {
+        // patchValue automatically types the old data into the form inputs!
+        this.expenseForm.patchValue({
+          title: existingExpense.title,
+          amount: existingExpense.amount,
+          category: existingExpense.category
+        });
+      }
     }
   }
-  
+
+  onSubmit() {
+    if (this.expenseForm.invalid) return;
+
+    const formData = this.expenseForm.value as any;
+
+    if (this.editId) {
+      // If we have an ID, call the UPDATE method
+      this.expenseService.updateExpense(this.editId, formData);
+    } else {
+      // If no ID, call the standard CREATE method
+      this.expenseService.addExpense(formData);
+    }
+
+    // Warp back to the dashboard instantly
+    this.router.navigate(['/dashboard']);
+  }
 }

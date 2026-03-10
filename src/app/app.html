@@ -1,11 +1,25 @@
-<nav class="top-nav">
-  <div class="logo">💰 SmartBudget</div>
-  <div class="nav-links">
-    <a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Dashboard</a>
-    <a routerLink="/add" routerLinkActive="active-link">Add Expense</a>
+@if (authService.currentUserSignal().token) {
+<nav
+  style="padding: 15px; background: #333; color: white; margin-bottom: 20px; display: flex; gap: 20px; align-items: center;">
+  <h3 style="margin: 0; padding-right: 20px; border-right: 1px solid #555;">Smart Budget</h3>
+
+  <a routerLink="/dashboard" style="color: white; text-decoration: none; cursor: pointer;">
+    Dashboard
+  </a>
+
+  <a routerLink="/add-expense" style="color: white; text-decoration: none; cursor: pointer;">
+    Add Expense
+  </a>
+
+  <div style="margin-left: auto;">
+    <button (click)="logout()"
+      style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+      Logout
+    </button>
   </div>
 </nav>
+}
 
-<main class="content-area">
+<div style="padding: 20px;">
   <router-outlet></router-outlet>
-</main>
+</div>

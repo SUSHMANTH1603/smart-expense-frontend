@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-dashboard',
   standalone: true,
   // 2. Add ReactiveFormsModule to your imports array!
-  imports: [CurrencyPipe, DatePipe, ExpenseCardComponent, ReactiveFormsModule, CategoryColorDirective,RouterLink],
+  imports: [CurrencyPipe, DatePipe, ReactiveFormsModule, CategoryColorDirective, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })

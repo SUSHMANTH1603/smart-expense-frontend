@@ -1,40 +1,45 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, finalize, throwError } from 'rxjs';
-import { LoadingService } from './services/loading';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+import { Auth } from './services/auth'; // Make sure this path matches!
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    const loadingService = inject(LoadingService);
-    const token = localStorage.getItem('token');
+  const authService = inject(Auth);
+  const router = inject(Router);
 
-    // 1. Turn on the loading bar the moment a request starts
-    loadingService.show();
+  // 1. THE REQUEST INTERCEPTOR (Outgoing)
+  // Grab the JWT token from our signal (or localStorage)
+  const token = authService.currentUserSignal().token;
 
-    // 2. The REQUEST Interceptor (Adding the token)
-    let clonedReq = req;
-    if (token) {
-        clonedReq = req.clone({
-            setHeaders: { Authorization: `Bearer ${token}` }
-        });
-    }
+  let modifiedReq = req;
 
-    // 3. The RESPONSE Interceptor
-    return next(clonedReq).pipe(
-        catchError((error: HttpErrorResponse) => {
-            console.error('Global HTTP Error Caught:', error.message);
-            if (error.status === 401) {
-                // Kick them to login if the token expired!
-                localStorage.removeItem('token');
-                window.location.href = '/login';
-            }
-            return throwError(() => error);
-        }),
-        // 4. Finalize ALWAYS runs, whether the request succeeded or failed
-        finalize(() => {
-            // THE SDE FIX: Force the bar to stay visible for 500ms so human eyes can see it!
-            setTimeout(() => {
-                loadingService.hide();
-            }, 300);
-        })
-    );
+  // If we have a token, clone the request and securely attach it to the headers
+  if (token) {
+    modifiedReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  }
+
+  // 2. THE RESPONSE INTERCEPTOR (Incoming)
+  // We pass the modified request to the next handler, but we use RxJS 'catchError' 
+  // to inspect any errors coming BACK from the server before the component sees them.
+  return next(modifiedReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+
+      // If the backend says our token is expired or invalid (401 Unauthorized)
+      if (error.status === 401) {
+        console.warn('Security Alert: JWT Expired or Invalid. Logging out.');
+
+        // Force the user out and wipe the bad token
+        authService.logout();
+        router.navigate(['/login']);
+      }
+
+      // Pass the error along so the component can still show a wobble animation if needed
+      return throwError(() => error);
+    })
+  );
 };

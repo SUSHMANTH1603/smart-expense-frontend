@@ -33,16 +33,26 @@
 }
 
 <div class="expense-list">
-    @for (expense of filteredExpenses(); track expense.id) {
-    <div class="expense-item">
+
+    @for (group of groupedExpenses(); track group.dateString) {
+
+    <h3
+        style="display: flex; justify-content: space-between; align-items: flex-end; color: #64748b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-top: 30px;">
+        <span>{{ group.dateString | date:'mediumDate' }}</span>
+        <span style="font-size: 1.1rem; color: #0f172a; font-weight: bold;">
+            {{ group.totalForDay | currency:'INR' }}
+        </span>
+    </h3>
+
+    @for (expense of group.expenses; track expense.id) {
+
+    <div class="expense-item" [class.is-deleting]="deletingIds().has(expense.id)">
 
         <div>
             <h3 style="margin: 0;">{{ expense.title }}</h3>
             <p
                 style="margin: 8px 0 0 0; color: #64748b; font-size: 0.9rem; display: flex; align-items: center; gap: 10px;">
                 <span [appCategoryColor]="expense.category">{{ expense.category }}</span>
-                <span>•</span>
-                <span>{{ expense.date | date:'mediumDate' }}</span>
             </p>
         </div>
 
@@ -62,6 +72,8 @@
         </div>
 
     </div>
+    }
+
     } @empty {
     <div style="text-align: center; padding: 40px; color: #94a3b8;">
         <h3>No expenses found.</h3>

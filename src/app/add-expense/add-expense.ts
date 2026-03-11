@@ -1,21 +1,28 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router'; // Add ActivatedRoute
-import { ExpenseService } from '../services/expense'; // or expense.service
+import { Router, ActivatedRoute } from '@angular/router';
+import { ExpenseService } from '../services/expense';
+// SDE IMPORT: We need switchMap and 'of' to handle reactive routing
+import { switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-add-expense',
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './add-expense.html',
-  styleUrl: './add-expense.css'
+  styleUrl: './add-expense.css',
+
+  // 1. DOM TREE OPTIMIZATION: OnPush
+  // Tells Angular to stop checking this component's HTML for changes unless 
+  // an Input changes or an event (like clicking Submit) fires!
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddExpenseComponent implements OnInit {
   private expenseService = inject(ExpenseService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute); // The tool to read the URL
+  private route = inject(ActivatedRoute);
 
-  editId: string | null = null; // Keeps track of whether we are editing or adding
+  editId: string | null = null;
 
   expenseForm = new FormGroup({
     title: new FormControl('', Validators.required),
@@ -24,22 +31,35 @@ export class AddExpenseComponent implements OnInit {
   });
 
   ngOnInit() {
-    // When the page loads, check if there is an ':id' in the URL
-    this.editId = this.route.snapshot.paramMap.get('id');
+    // 2. THE SDE RXJS PATTERN: Using switchMap instead of snapshot
+    // A junior dev uses `this.route.snapshot`. But if the URL changes while they are 
+    // ALREADY on the page, the snapshot doesn't update, and the app breaks!
+    // We subscribe to the URL changes reactively using switchMap.
 
-    if (this.editId) {
-      // We are in Edit Mode! Let's find the existing expense in our Signal
-      const existingExpense = this.expenseService.expenses().find(e => e.id === this.editId);
+    this.route.paramMap.pipe(
+      switchMap(params => {
+        const id = params.get('id');
+        this.editId = id;
 
-      if (existingExpense) {
-        // patchValue automatically types the old data into the form inputs!
+        if (id) {
+          // Find the expense. If this was a massive enterprise app, we would use 
+          // switchMap here to fire an HTTP GET request to the database!
+          const existingExpense = this.expenseService.expenses().find(e => e.id === id);
+          return of(existingExpense); // Wraps our data back into an RxJS Observable
+        }
+
+        return of(null); // If no ID, return null
+      })
+    ).subscribe(expense => {
+      // Once switchMap finishes its job, we patch the form
+      if (expense) {
         this.expenseForm.patchValue({
-          title: existingExpense.title,
-          amount: existingExpense.amount,
-          category: existingExpense.category
+          title: expense.title,
+          amount: expense.amount,
+          category: expense.category
         });
       }
-    }
+    });
   }
 
   onSubmit() {
@@ -48,14 +68,11 @@ export class AddExpenseComponent implements OnInit {
     const formData = this.expenseForm.value as any;
 
     if (this.editId) {
-      // If we have an ID, call the UPDATE method
       this.expenseService.updateExpense(this.editId, formData);
     } else {
-      // If no ID, call the standard CREATE method
       this.expenseService.addExpense(formData);
     }
 
-    // Warp back to the dashboard instantly
     this.router.navigate(['/dashboard']);
   }
 }

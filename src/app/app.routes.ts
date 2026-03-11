@@ -1,32 +1,31 @@
 import { Routes } from '@angular/router';
 import { AuthComponent } from './auth/auth';
-import { authGuard } from './auth-guard';
-
-// Notice we REMOVED the static imports for Dashboard and AddExpense at the top!
+import { Dashboard } from './dashboard/dashboard';
+import { AddExpenseComponent } from './add-expense/add-expense';
+import { authGuard } from './auth-guard'; // 1. IMPORT YOUR NEW GUARD!
 
 export const routes: Routes = [
-  // The Login page is loaded immediately (eager loading) because it's the front door
+  // Public Route (Anyone can see this)
   { path: 'login', component: AuthComponent },
 
-  // The Dashboard is LAZY LOADED. It is only fetched from the server IF the user passes the guard.
+  // Protected Routes (Secured by authGuard)
   {
     path: 'dashboard',
-    loadComponent: () => import('./dashboard/dashboard').then(m => m.Dashboard),
-    canActivate: [authGuard]
+    component: Dashboard,
+    canActivate: [authGuard] // THE LOCK 🔒
   },
-
-  // The Add/Edit pages are also LAZY LOADED.
   {
     path: 'add-expense',
-    loadComponent: () => import('./add-expense/add-expense').then(m => m.AddExpenseComponent),
-    canActivate: [authGuard]
+    component: AddExpenseComponent,
+    canActivate: [authGuard] // THE LOCK 🔒
   },
   {
     path: 'edit-expense/:id',
-    loadComponent: () => import('./add-expense/add-expense').then(m => m.AddExpenseComponent),
-    canActivate: [authGuard]
+    component: AddExpenseComponent,
+    canActivate: [authGuard] // THE LOCK 🔒
   },
 
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' }
+  // Fallbacks
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '**', redirectTo: '/dashboard' } // Catch-all wildcard
 ];

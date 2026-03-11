@@ -1,25 +1,25 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
+// THE FIX: We added RouterLink so your navbar buttons actually work again!
+import { RouterOutlet, RouterLink, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
 import { LoadingService } from './services/loading';
-import { Auth } from './services/auth'; // Ensure this path is correct!
+import { Auth } from './services/auth';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  // If RouterLink is missing here, your navigation buttons die.
+  imports: [RouterOutlet, RouterLink],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class AppComponent {
-  // 1. New Loading Bar logic
+  // 1. Core Services
   loadingService = inject(LoadingService);
-
-  // 2. RESTORED: Authentication logic so your HTML doesn't crash!
   authService = inject(Auth);
   private router = inject(Router);
 
   constructor() {
-    // The Loading Bar Router Listener
+    // 2. The Global Router Listener for the Loading Bar
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         this.loadingService.show();
@@ -28,14 +28,14 @@ export class AppComponent {
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        setTimeout(() => this.loadingService.hide(), 500);
+        setTimeout(() => this.loadingService.hide(), 500); // 500ms artificial delay
       }
     });
   }
 
-  // RESTORED: The logout function your button is looking for
+  // 3. The Authentication Flow
   logout() {
-    this.authService.logout(); // Call your auth service's logout method
-    this.router.navigate(['/login']); // Send them back to the login page
+    this.authService.logout(); // Clears your local storage / JWT
+    this.router.navigate(['/login']); // Redirects to the login screen
   }
 }

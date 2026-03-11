@@ -1,17 +1,21 @@
-import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { Auth } from './services/auth';
+import { CanActivateFn, Router } from '@angular/router';
+import { Auth } from './services/auth'; // Make sure this path is correct!
 
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(Auth);
   const router = inject(Router);
 
-  // If the user has a token in memory, let them pass!
-  if (authService.currentUserSignal().token) {
+  // 1. Check the Signal for a valid token
+  const hasToken = !!authService.currentUserSignal().token;
+
+  if (hasToken) {
+    // 2. Access Granted: Let them route to the dashboard
     return true;
   }
 
-  // If they don't have a token, kick them back to the login screen
+  // 3. Access Denied: Kick them back to the Login page
+  console.warn('Security Alert: Unauthorized access attempt blocked.');
   router.navigate(['/login']);
   return false;
 };

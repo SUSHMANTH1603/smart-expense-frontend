@@ -4,7 +4,7 @@
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
@@ -26,7 +26,8 @@ label {
   color: #34495e;
 }
 
-input, select {
+input,
+select {
   padding: 0.8rem;
   border: 1px solid #bdc3c7;
   border-radius: 6px;
@@ -34,7 +35,8 @@ input, select {
   transition: border-color 0.2s;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #3498db;
 }
@@ -66,4 +68,23 @@ input.ng-invalid.ng-touched {
   background-color: #95a5a6;
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+/* 1. Make the text light grey ONLY when the placeholder is active */
+.category-dropdown:invalid {
+  color: #94a3b8;
+  /* Light placeholder grey */
+}
+
+/* 2. Ensure the actual options in the dropdown menu remain dark */
+.category-dropdown option {
+  color: #0f172a;
+  /* Dark text */
+}
+
+/* Optional: If you want the dropdown to look nice when they click it */
+.category-dropdown:focus {
+  outline: none;
+  border-color: #3b82f6;
+  /* Blue focus ring */
 }

@@ -16,7 +16,8 @@
 
     <div class="form-group">
       <label for="category">Category</label>
-      <select id="category" formControlName="category">
+      <select id="category" formControlName="category" required class="category-dropdown">
+        <option value="" disabled selected hidden>e.g., Food & Dining ,Transportation ,Entertainment...</option>
         <option value="Food">Food & Dining</option>
         <option value="Transport">Transportation</option>
         <option value="Entertainment">Entertainment</option>

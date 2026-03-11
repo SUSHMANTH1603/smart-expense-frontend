@@ -46,7 +46,7 @@ export class AppComponent {
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        setTimeout(() => this.loadingService.hide(), 500); // 500ms artificial delay
+        setTimeout(() => this.loadingService.hide(), 300); // 300ms artificial delay
       }
     });
   }

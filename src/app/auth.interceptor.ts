@@ -34,7 +34,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             // THE SDE FIX: Force the bar to stay visible for 500ms so human eyes can see it!
             setTimeout(() => {
                 loadingService.hide();
-            }, 500);
+            }, 300);
         })
     );
 };

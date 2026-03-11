@@ -22,7 +22,7 @@ import { LoadingService } from './services/loading';
       height: 4px;
       background: linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899);
       background-size: 200% 100%;
-      z-index: 99999; /* Make sure it's on top of EVERYTHING */
+      z-index: 9999;
       animation: loading-wave 1.5s infinite linear;
     }
 
@@ -46,7 +46,8 @@ export class AppComponent {
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        setTimeout(() => this.loadingService.hide(), 300); // 300ms artificial delay
+        // Add a tiny artificial delay so it looks smooth even if the page loads instantly
+        setTimeout(() => this.loadingService.hide(), 300);
       }
     });
   }

@@ -4,7 +4,7 @@ import { CurrencyPipe, DatePipe, KeyValuePipe } from '@angular/common'; // Added
 import { ExpenseCardComponent } from '../../shared/components/expense-card/expense-card';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { CategoryColorDirective } from '/Users/sushmanthreddy/Documents/smart-expense-frontend/src/app/directives/category-color';
+import { CategoryColorDirective } from '../../directives/category-color';
 import { RouterLink } from '@angular/router';
 
 @Component({

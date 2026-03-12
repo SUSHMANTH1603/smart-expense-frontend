@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 // THE FIX: We added RouterLink so your navbar buttons actually work again!
 import { RouterOutlet, RouterLink, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
-import { LoadingService } from './services/loading';
-import { Auth } from './services/auth';
+import { LoadingService } from './shared/components/loading';
+import { Auth } from './core/services/auth';
 
 @Component({
   selector: 'app-root',

@@ -1,31 +1,26 @@
 import { Routes } from '@angular/router';
-import { AuthComponent } from './auth/auth';
-import { Dashboard } from './dashboard/dashboard';
-import { AddExpenseComponent } from './add-expense/add-expense';
-import { authGuard } from './auth-guard'; // 1. IMPORT YOUR NEW GUARD!
+import { authGuard } from './core/guards/auth-guard'; // 1. IMPORT YOUR NEW GUARD!
 
 export const routes: Routes = [
-  // Public Route (Anyone can see this)
-  { path: 'login', component: AuthComponent },
-
-  // Protected Routes (Secured by authGuard)
+  {
+    path: 'login',
+    loadComponent: () => import('./features/auth/auth').then(m => m.AuthComponent)
+  },
   {
     path: 'dashboard',
-    component: Dashboard,
-    canActivate: [authGuard] // THE LOCK 🔒
+    loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard),
+    canActivate: [authGuard]
   },
   {
     path: 'add-expense',
-    component: AddExpenseComponent,
-    canActivate: [authGuard] // THE LOCK 🔒
+    loadComponent: () => import('./features/add-expense/add-expense').then(m => m.AddExpenseComponent),
+    canActivate: [authGuard]
   },
   {
     path: 'edit-expense/:id',
-    component: AddExpenseComponent,
-    canActivate: [authGuard] // THE LOCK 🔒
+    loadComponent: () => import('./features/add-expense/add-expense').then(m => m.AddExpenseComponent),
+    canActivate: [authGuard]
   },
-
-  // Fallbacks
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' } // Catch-all wildcard
 ];

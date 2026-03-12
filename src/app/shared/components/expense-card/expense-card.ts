@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { Expense } from '../services/expense'; // Adjust the path if your service is elsewhere
+import { Expense } from '../../../core/services/expense';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 
 @Component({

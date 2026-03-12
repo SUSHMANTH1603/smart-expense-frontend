@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ExpenseService } from '../services/expense';
+import { ExpenseService } from '../../core/services/expense';
 // SDE IMPORT: We need switchMap and 'of' to handle reactive routing
 import { switchMap, of } from 'rxjs';
 

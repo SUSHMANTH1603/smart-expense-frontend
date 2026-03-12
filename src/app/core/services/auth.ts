@@ -1,13 +1,15 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class Auth {
   private http = inject(HttpClient);
-  private apiUrl = 'https://expense-backend-6b8n.onrender.com/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   // SDE Concept: Signals for Authentication State
   // We check if a token already exists in localStorage when the app boots up

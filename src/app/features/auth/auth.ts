@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Auth } from '../services/auth';
+import { Auth } from '../../core/services/auth';
 
 @Component({
   selector: 'app-auth',

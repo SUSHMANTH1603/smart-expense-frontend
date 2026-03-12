@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 // 1. Import HttpClient
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface Expense {
   id: string;
@@ -19,7 +20,7 @@ export class ExpenseService {
   private http = inject(HttpClient);
 
   // 3. Define the URL to our Express server
-  private apiUrl = 'https://expense-backend-6b8n.onrender.com/api/expenses';
+  private apiUrl = `${environment.apiUrl}/expenses`;
   //private apiUrl = 'http://localhost:3000/api/expenses';
   private expensesSignal = signal<Expense[]>([]);
   expenses = this.expensesSignal.asReadonly();

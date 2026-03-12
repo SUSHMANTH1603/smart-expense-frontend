@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { ExpenseService } from '../../core/services/expense';
 import { CurrencyPipe, DatePipe, KeyValuePipe } from '@angular/common'; // Added KeyValuePipe for grouping
-import { ExpenseCardComponent } from '/Users/sushmanthreddy/Documents/smart-expense-frontend/src/app/shared/components/expense-card/expense-card';
+import { ExpenseCardComponent } from '../../shared/components/expense-card/expense-card';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { CategoryColorDirective } from '/Users/sushmanthreddy/Documents/smart-expense-frontend/src/app/directives/category-color';

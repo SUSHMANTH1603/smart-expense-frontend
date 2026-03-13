@@ -65,7 +65,7 @@ export class Dashboard implements OnInit {
   });
 
   ngOnInit() {
-    this.expenseService.fetchExpenses();
+
 
     this.searchControl.valueChanges.pipe(
       debounceTime(300),

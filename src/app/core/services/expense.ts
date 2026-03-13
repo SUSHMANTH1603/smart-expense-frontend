@@ -56,15 +56,43 @@ export class ExpenseService {
   }
 
   addExpense(expenseData: Omit<Expense, 'id' | 'date'>) {
-    this.http.post<Expense>(this.apiUrl, expenseData).subscribe(newExpense => {
-      this.expensesSignal.update(current => {
-        // SDE FIX 2: The Duplicate Blocker. 
-        // If Angular accidentally tries to add it twice, we block it.
-        const alreadyExists = current.find(e => e.id === newExpense.id);
-        if (alreadyExists) return current;
+    // 1. Create a lightning-fast temporary expense
+    const tempId = 'temp-' + Date.now();
+    const optimisticExpense: Expense = {
+      ...expenseData,
+      id: tempId,
+      date: new Date().toISOString()
+    };
 
-        return [newExpense, ...current];
-      });
+    // 2. BOOM. Instantly update the UI in 0.000 milliseconds. 
+    this.expensesSignal.update(current => [optimisticExpense, ...current]);
+
+    // 3. Send it to the backend quietly in the background
+    this.http.post<Expense>(this.apiUrl, expenseData).subscribe({
+      next: (realExpenseFromServer) => {
+
+        this.expensesSignal.update(current => {
+          // SDE ARMOR: Did a rogue GET request wipe our temp item?
+          const tempExists = current.find(e => e.id === tempId);
+
+          if (tempExists) {
+            // Normal flow: Swap the fake ID for the real database ID invisibly
+            return current.map(expense => expense.id === tempId ? realExpenseFromServer : expense);
+          } else {
+            // Recovery flow: The temp item was wiped. 
+            // Check if the real item is already here to prevent duplicates!
+            const realExists = current.find(e => e.id === realExpenseFromServer.id);
+            if (realExists) return current; // Already here, do nothing.
+
+            // Safe to add!
+            return [realExpenseFromServer, ...current];
+          }
+        });
+      },
+      error: (err) => {
+        console.error("Failed to save:", err);
+        this.expensesSignal.update(current => current.filter(e => e.id !== tempId));
+      }
     });
   }
 

@@ -20,9 +20,25 @@ export class ExpenseService {
   private expensesSignal = signal<Expense[]>([]);
   expenses = this.expensesSignal.asReadonly();
 
-  // This perfectly matches the aggregation pipeline we just built in the backend
-  private statsSignal = signal<{ _id: string, totalSpent: number }[]>([]);
-  stats = this.statsSignal.asReadonly();
+  // SDE FIX 1: Calculate the chart data LOCALLY in memory. 
+  // Zero network calls = zero lag and zero chart jitter.
+  stats = computed(() => {
+    const categoryTotals: { [key: string]: number } = {};
+
+    // Group the current expenses by category instantly
+    this.expensesSignal().forEach(expense => {
+      if (!categoryTotals[expense.category]) {
+        categoryTotals[expense.category] = 0;
+      }
+      categoryTotals[expense.category] += expense.amount;
+    });
+
+    // Format it perfectly for your bar graph
+    return Object.keys(categoryTotals).map(key => ({
+      _id: key,
+      totalSpent: categoryTotals[key]
+    }));
+  });
 
   totalSpent = computed(() => {
     return this.expensesSignal().reduce((sum, item) => sum + item.amount, 0);
@@ -32,35 +48,33 @@ export class ExpenseService {
     this.fetchExpenses();
   }
 
+  // We only fetch from the database once when the app loads!
   fetchExpenses() {
     this.http.get<Expense[]>(this.apiUrl).subscribe(data => {
       this.expensesSignal.set(data);
-      this.fetchStats();
-    });
-  }
-
-  fetchStats() {
-    this.http.get<{ _id: string, totalSpent: number }[]>(`${this.apiUrl}/stats`).subscribe(data => {
-      this.statsSignal.set(data);
     });
   }
 
   addExpense(expenseData: Omit<Expense, 'id' | 'date'>) {
     this.http.post<Expense>(this.apiUrl, expenseData).subscribe(newExpense => {
-      // Backend returns the real ID instantly, so we just add it to the top of the signal!
-      this.expensesSignal.update(current => [newExpense, ...current]);
-      this.fetchStats(); // Update the bar chart
+      this.expensesSignal.update(current => {
+        // SDE FIX 2: The Duplicate Blocker. 
+        // If Angular accidentally tries to add it twice, we block it.
+        const alreadyExists = current.find(e => e.id === newExpense.id);
+        if (alreadyExists) return current;
+
+        return [newExpense, ...current];
+      });
     });
   }
 
   deleteExpense(id: string) {
-    // 1. Instant UI removal for that lightning-fast feel
+    // Instant UI removal. The computed stats chart will also update instantly!
     this.expensesSignal.update(current => current.filter(expense => expense.id !== id));
 
-    // 2. Background deletion
+    // Delete from the backend silently in the background
     this.http.delete(`${this.apiUrl}/${id}`).subscribe({
-      next: () => this.fetchStats(), // Update the bar chart
-      error: () => this.fetchExpenses() // If server fails, refresh data to put it back
+      error: () => this.fetchExpenses() // Only re-fetch if the server crashes
     });
   }
 
@@ -69,7 +83,6 @@ export class ExpenseService {
       this.expensesSignal.update(current =>
         current.map(expense => expense.id === id ? updatedExpense : expense)
       );
-      this.fetchStats();
     });
   }
 }

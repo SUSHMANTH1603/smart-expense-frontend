@@ -56,24 +56,53 @@ export class ExpenseService {
     });
   }
 
-  // CREATE: POST data to Node.js
+  // CREATE: Instant UI Update (Optimistic)
   addExpense(expenseData: Omit<Expense, 'id' | 'date'>) {
-    this.http.post<Expense>(this.apiUrl, expenseData).subscribe(newExpenseFromServer => {
-      // THE SDE FIX: Put the 'newExpenseFromServer' FIRST in the array, 
-      // then spread the rest of the 'current' items after it!
-      this.expensesSignal.update(current => [newExpenseFromServer, ...current]);
+    // 1. Create a temporary "Fake" expense to show the user instantly
+    const optimisticExpense: Expense = {
+      ...expenseData,
+      id: 'temp-' + Date.now(), // Fake ID
+      date: new Date().toISOString()
+    };
 
-      // (Optional: If you added this earlier, keep it so the chart updates instantly too!)
-      this.fetchStats();
+    // 2. Instantly put it on the screen! Zero lag.
+    this.expensesSignal.update(current => [optimisticExpense, ...current]);
+
+    // 3. Send it to the backend silently
+    this.http.post<Expense>(this.apiUrl, expenseData).subscribe({
+      next: (newExpenseFromServer) => {
+        // Once the server saves it, silently swap the fake ID for the real database ID
+        this.expensesSignal.update(current =>
+          current.map(expense => expense.id === optimisticExpense.id ? newExpenseFromServer : expense)
+        );
+        this.fetchStats(); // Update chart in background
+      },
+      error: (err) => {
+        // If the server crashes, remove the fake item from the screen
+        console.error('Server failed to save expense', err);
+        this.expensesSignal.update(current => current.filter(e => e.id !== optimisticExpense.id));
+      }
     });
   }
 
-  // DELETE: Send DELETE request to Node.js
+  // DELETE: Instant UI Update (Optimistic)
   deleteExpense(id: string) {
-    this.http.delete(`${this.apiUrl}/${id}`).subscribe(() => {
-      // Once the server confirms it deleted the row, we remove it from our Signal
-      this.expensesSignal.update(current => current.filter(expense => expense.id !== id));
-      this.fetchStats();
+    // 1. Save a backup of the current state just in case
+    const previousState = this.expensesSignal();
+
+    // 2. Instantly remove it from the screen! Zero lag.
+    this.expensesSignal.update(current => current.filter(expense => expense.id !== id));
+
+    // 3. Tell the backend to delete it silently
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+      next: () => {
+        this.fetchStats(); // Update chart in background
+      },
+      error: (err) => {
+        // If the server fails to delete it, put it back on the screen!
+        console.error('Server failed to delete expense', err);
+        this.expensesSignal.set(previousState);
+      }
     });
   }
 
